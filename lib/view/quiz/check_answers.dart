@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:trivia_quiz_app/models/question.dart';
+import 'package:trivia_quiz_app/view/home.dart';
 
 class CheckAnswersPage extends StatelessWidget {
   final List<Question> questions;
@@ -38,9 +41,14 @@ class CheckAnswersPage extends StatelessWidget {
   Widget _buildItem(BuildContext context, int index) {
     if (index == questions.length) {
       return ElevatedButton(
-        child: const Text("Done"),
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.green,
+          minimumSize: const Size.fromHeight(45),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
+        ),
+        child: const Text("Done", style: TextStyle(color: Colors.white)),
         onPressed: () {
-          Navigator.of(context).popUntil(ModalRoute.withName(Navigator.defaultRouteName));
+          Get.offAll(() => const HomePage());
         },
       );
     }

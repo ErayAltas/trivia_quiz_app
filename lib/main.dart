@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:trivia_quiz_app/ui/pages/home.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:trivia_quiz_app/view/splash/splash_view.dart';
 
 void main() => runApp(const MyApp());
 
@@ -8,10 +9,10 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return const GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Open Trivia',
-      home: HomePage(),
+      title: 'Quiz Time',
+      home: SplashView(),
     );
   }
 }

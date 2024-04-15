@@ -1,13 +1,13 @@
 // ignore_for_file: use_build_context_synchronously
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:get/get_navigation/get_navigation.dart';
 import 'package:trivia_quiz_app/models/category.dart';
 import 'package:trivia_quiz_app/models/question.dart';
-import 'package:trivia_quiz_app/resources/api_provider.dart';
-import 'package:trivia_quiz_app/ui/pages/error.dart';
-import 'package:trivia_quiz_app/ui/pages/quiz_page.dart';
+import 'package:trivia_quiz_app/service/api_service.dart';
+import 'package:trivia_quiz_app/service/helper.dart';
+import 'package:trivia_quiz_app/view/quiz/quiz_page.dart';
 
 class QuizOptionsDialog extends StatefulWidget {
   final Category? category;
@@ -18,7 +18,7 @@ class QuizOptionsDialog extends StatefulWidget {
 }
 
 class QuizOptionsDialogState extends State<QuizOptionsDialog> {
-  int noOfQuestions = 10;
+  int noOfQuestions = 5;
   String difficulty = "any";
   bool processing = false;
 
@@ -47,6 +47,13 @@ class QuizOptionsDialogState extends State<QuizOptionsDialog> {
               spacing: 16.0,
               children: [
                 ActionChip(
+                  label: const Text("5"),
+                  labelStyle: const TextStyle(color: Colors.white),
+                  backgroundColor: noOfQuestions == 5 ? Colors.indigo : Colors.grey.shade600,
+                  onPressed: () => _selectNumberOfQuestions(5),
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
+                ),
+                ActionChip(
                   label: const Text("10"),
                   labelStyle: const TextStyle(color: Colors.white),
                   backgroundColor: noOfQuestions == 10 ? Colors.indigo : Colors.grey.shade600,
@@ -54,31 +61,17 @@ class QuizOptionsDialogState extends State<QuizOptionsDialog> {
                   labelPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
                 ),
                 ActionChip(
+                  label: const Text("15"),
+                  labelStyle: const TextStyle(color: Colors.white),
+                  backgroundColor: noOfQuestions == 15 ? Colors.indigo : Colors.grey.shade600,
+                  onPressed: () => _selectNumberOfQuestions(15),
+                  labelPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
+                ),
+                ActionChip(
                   label: const Text("20"),
                   labelStyle: const TextStyle(color: Colors.white),
                   backgroundColor: noOfQuestions == 20 ? Colors.indigo : Colors.grey.shade600,
                   onPressed: () => _selectNumberOfQuestions(20),
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-                ),
-                ActionChip(
-                  label: const Text("30"),
-                  labelStyle: const TextStyle(color: Colors.white),
-                  backgroundColor: noOfQuestions == 30 ? Colors.indigo : Colors.grey.shade600,
-                  onPressed: () => _selectNumberOfQuestions(30),
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-                ),
-                ActionChip(
-                  label: const Text("40"),
-                  labelStyle: const TextStyle(color: Colors.white),
-                  backgroundColor: noOfQuestions == 40 ? Colors.indigo : Colors.grey.shade600,
-                  onPressed: () => _selectNumberOfQuestions(40),
-                  labelPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
-                ),
-                ActionChip(
-                  label: const Text("50"),
-                  labelStyle: const TextStyle(color: Colors.white),
-                  backgroundColor: noOfQuestions == 50 ? Colors.indigo : Colors.grey.shade600,
-                  onPressed: () => _selectNumberOfQuestions(50),
                   labelPadding: const EdgeInsets.symmetric(horizontal: 15, vertical: 2),
                 ),
               ],
@@ -167,45 +160,15 @@ class QuizOptionsDialogState extends State<QuizOptionsDialog> {
       processing = true;
     });
     try {
-      List<Question> questions = await getQuestions(
-        category: widget.category!,
-        total: noOfQuestions,
-        difficulty: difficulty,
-      );
+      List<Question> questions = await getQuestions(category: widget.category!, total: noOfQuestions, difficulty: difficulty);
       Navigator.pop(context);
       if (questions.isEmpty) {
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (_) => const ErrorPage(
-              message: "There are not enough questions in the category, with the options you selected.",
-            ),
-          ),
-        );
+        Helper.showToastError("There are not enough questions in the category, with the options you selected.");
         return;
       }
-      Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (_) => QuizPage(
-                    questions: questions,
-                    category: widget.category,
-                  )));
-    } on SocketException catch (_) {
-      Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (_) => const ErrorPage(
-                    message: "Can't reach the servers, \n Please check your internet connection.",
-                  )));
+      Get.to(() => QuizPage(questions: questions, category: widget.category));
     } catch (e) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (_) => const ErrorPage(
-            message: "Unexpected error trying to connect to the API",
-          ),
-        ),
-      );
+      Helper.showToastError("Failed to load questions. Please check your internet connection.");
     }
     setState(() {
       processing = false;

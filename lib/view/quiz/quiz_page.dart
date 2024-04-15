@@ -5,7 +5,7 @@ import 'package:flutter_custom_clippers/flutter_custom_clippers.dart';
 import 'package:html_unescape/html_unescape.dart';
 import 'package:trivia_quiz_app/models/category.dart';
 import 'package:trivia_quiz_app/models/question.dart';
-import 'package:trivia_quiz_app/ui/pages/quiz_finished.dart';
+import 'package:trivia_quiz_app/view/quiz/quiz_finished.dart';
 
 class QuizPage extends StatefulWidget {
   final List<Question> questions;
@@ -38,7 +38,7 @@ class QuizPageState extends State<QuizPage> {
       child: Scaffold(
         key: _key,
         appBar: AppBar(
-          title: Text(widget.category!.name),
+          title: Text("${widget.category!.name} (${_currentIndex + 1}/${widget.questions.length})"),
           elevation: 0,
         ),
         body: Stack(
